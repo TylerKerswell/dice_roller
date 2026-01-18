@@ -62,6 +62,14 @@ export default class BoardScene extends Phaser.Scene {
   }
 
   create() {
+    const { width, height } = this.scale;
+    
+    this.infoText = this.add.text(width * 0.5, height * 0.92, "", {
+    fontFamily: "Arial",
+    fontSize: "16px",
+    color: "#a7a7c7",
+  }).setOrigin(0.5);
+
     if (this._shouldGoToWin) {
       // Show win message and restart
       this.infoText.setText("You win! Restarting...");
@@ -73,7 +81,7 @@ export default class BoardScene extends Phaser.Scene {
       return;
     }
 
-    const { width, height } = this.scale;
+   
 
     // Background
     this.add.rectangle(width / 2, height / 2, width, height, 0x0b0b12);
