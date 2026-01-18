@@ -25,10 +25,12 @@ export default class MenuScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(width / 2, height * 0.32, "Roll your fate. Survive the floors.", {
+      .text(width / 2, height * 0.28, "Roll your fate. Survive the floors.", {
         fontFamily: "Arial, sans-serif",
         fontSize: "18px",
         color: "#cfcfe6",
+        align :"center",
+        lineSpacing: 6,
       })
       .setOrigin(0.5);
 
@@ -71,7 +73,7 @@ export default class MenuScene extends Phaser.Scene {
     const text = this.add.text(0, 0, label, {
       fontFamily: "Arial, sans-serif",
       fontSize: "20px",
-      color: "#ffffff",
+      color: "#100f0f",
       fontStyle: "bold",
     });
 
