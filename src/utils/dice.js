@@ -11,6 +11,30 @@ export const baseBag = [
   { id: "a5", name: "Strike", type: "attack", basePower: 1 },
 ];
 
+export const upgradedBag1 = [
+  { id: "a1", name: "Strike", type: "attack", basePower: 2 },
+  { id: "a2", name: "Strike", type: "attack", basePower: 1 },
+  { id: "a3", name: "Strike", type: "attack", basePower: 3 },
+  { id: "a4", name: "Strike", type: "attack", basePower: 1 },
+  { id: "a5", name: "Strike", type: "attack", basePower: 2 },
+];
+
+export const upgradedBag2 = [
+  { id: "a1", name: "Strike", type: "attack", basePower: 3 },
+  { id: "a2", name: "Strike", type: "attack", basePower: 3 },
+  { id: "a3", name: "Strike", type: "attack", basePower: 3 },
+  { id: "a4", name: "Strike", type: "attack", basePower: 3 },
+  { id: "a5", name: "Strike", type: "attack", basePower: 3 },
+];
+
+export const upgradedBag3 = [
+  { id: "a1", name: "Strike", type: "attack", basePower: 4 },
+  { id: "a2", name: "Strike", type: "attack", basePower: 3 },
+  { id: "a3", name: "Strike", type: "attack", basePower: 4 },
+  { id: "a4", name: "Strike", type: "attack", basePower: 3 },
+  { id: "a5", name: "Strike", type: "attack", basePower: 5 },
+];
+
 // Draw N dice randomly (with replacement)
 export function drawDice(bag, count) {
   const drawn = [];
@@ -21,11 +45,11 @@ export function drawDice(bag, count) {
   return drawn;
 }
 
-// Roll a single attack die: damage = roll (1-6) + basePower
+// Roll a single attack die: damage = roll (1-6) * basePower
 export function rollAttackDie(die) {
   const roll = randInt(1, 6);
   const basePower = die.basePower ?? 0;
-  const damage = roll + basePower;
+  const damage = roll * basePower;
 
   return {
     die,
