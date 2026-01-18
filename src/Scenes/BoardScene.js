@@ -38,6 +38,10 @@ export default class BoardScene extends Phaser.Scene {
   }
 
   init(data) {
+    // IMPORTANT: reset flags every time scene starts
+    this._shouldGoToWin = false;
+    this.isBusy = false;
+    
     // Load run state from registry or start fresh
     const saved = this.registry.get("runState");
 
@@ -56,15 +60,17 @@ export default class BoardScene extends Phaser.Scene {
     const isBoss = !!data?.isBoss;
 
     if (outcome === "win" && isBoss) {
-      if (this.runState.floor >= MAX_FLOORS) {
-        this.registry.remove("runState");
-        this._shouldGoToWin = true;
-      } else {
-        this.runState.floor += 1;
-        this.runState.tier = 0;
-        this.lastResult = "Boss defeated! Next floor!";
-      }
+    // If you beat the boss ON floor 3, you win
+    if (this.runState.floor >= MAX_FLOORS) {
+      this._shouldGoToWin = true;
+    } else {
+      // Otherwise advance to next floor and reset tier
+      this.runState.floor += 1;
+      this.runState.tier = 0;
+      this.lastResult = "Boss defeated! Next floor!";
     }
+  }
+
 
     // Create player if not provided
     this.player = data?.player ?? new Player(100);
@@ -84,15 +90,9 @@ export default class BoardScene extends Phaser.Scene {
   }).setOrigin(0.5);
 
     if (this._shouldGoToWin) {
-      // Show win message and restart
-      this.infoText.setText("You win! Restarting...");
-      this.time.delayedCall(2000, () => {
-        this.registry.remove("runState");
-        this.registry.remove("player");
-        window.location.reload();
-      });
-      return;
-    }
+    this.scene.start("WinScene");
+    return;
+  }
 
    
 

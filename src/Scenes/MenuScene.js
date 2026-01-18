@@ -36,6 +36,9 @@ export default class MenuScene extends Phaser.Scene {
   height * 0.5,
   "Start Run",
   () => {
+    this.registry.remove("runState");
+    this.registry.remove("player");
+    
     this.scene.start("BoardScene", {
       floor: 1,
       difficulty: "normal",
