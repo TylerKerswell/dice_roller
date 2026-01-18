@@ -1,8 +1,8 @@
 import Phaser from "phaser";
-import MenuScene from "./Scenes/MenuScene.js";
 import BattleScene from "./Scenes/BattleScene.js";
 import BoardScene from "./Scenes/BoardScene.js";
 import ShopScene from "./Scenes/ShopScene.js";
+import EventScene from "./Scenes/EventScene.js";
 
 const BASE_WIDTH = 1920;
 const BASE_HEIGHT = 1080;
