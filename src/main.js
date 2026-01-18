@@ -2,13 +2,14 @@ import Phaser from "phaser";
 import MenuScene from "./Scenes/MenuScene.js";
 import BattleScene from "./Scenes/BattleScene.js";
 import BoardScene from "./Scenes/BoardScene.js";
+import ShopScene from "./Scenes/ShopScene.js";
 
 const config = {
   type: Phaser.AUTO,
   width: 1080,
   height: 720,
   backgroundColor: "#ffffff",
-  scene: [MenuScene, BoardScene, BattleScene]
+  scene: [MenuScene, BoardScene, BattleScene, ShopScene]
 };
 
 new Phaser.Game(config);

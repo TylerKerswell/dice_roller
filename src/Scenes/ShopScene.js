@@ -82,26 +82,33 @@ export default class ShopScene extends Phaser.Scene {
   }
 
   makeButton(x, y, label, onClick) {
-    const text = this.add.text(0, 0, label, {
-      fontSize: "22px",
-      color: "#ffffff",
-      fontStyle: "bold",
-    });
+  // Create container
+  const container = this.add.container(x, y);
 
-    const padX = 30;
-    const padY = 16;
-    const w = text.width + padX * 2;
-    const h = text.height + padY * 2;
+  // Background rectangle
+  const text = this.add.text(0, 0, label, {
+    fontFamily: "Arial",
+    fontSize: "22px",
+    color: "#ffffff",
+    fontStyle: "bold",
+  }).setOrigin(0.5);
 
-    const bg = this.add
-      .rectangle(x, y, w, h, 0x7862ff, 1)
-      .setStrokeStyle(2, 0xffffff, 0.3)
-      .setInteractive({ useHandCursor: true });
+  const padX = 26;
+  const padY = 14;
+  const w = text.width + padX * 2;
+  const h = text.height + padY * 2;
 
-    text.setPosition(x - text.width / 2, y - text.height / 2);
+  const bg = this.add.rectangle(0, 0, w, h, 0x7862ff, 0.9)
+    .setStrokeStyle(2, 0xffffff, 0.2)
+    .setInteractive({ useHandCursor: true });
 
-    bg.on("pointerover", () => bg.setFillStyle(0x8b7bff, 1));
-    bg.on("pointerout", () => bg.setFillStyle(0x7862ff, 1));
-    bg.on("pointerdown", onClick);
-  }
+  container.add([bg, text]);
+
+  bg.on("pointerover", () => bg.setFillStyle(0x8b7bff, 0.95));
+  bg.on("pointerout", () => bg.setFillStyle(0x7862ff, 0.9));
+  bg.on("pointerdown", onClick);
+
+  return container; // return the whole container
+}
+
 }
