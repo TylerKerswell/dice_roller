@@ -5,8 +5,12 @@ import BoardScene from "./Scenes/BoardScene.js";
 
 const config = {
   type: Phaser.AUTO,
-  width: 1080,
-  height: 720,
+  scale: {
+    mode: Phaser.Scale.ENVELOP,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: 1920,
+    height: 1080,
+  },
   backgroundColor: "#ffffff",
   scene: [MenuScene, BoardScene, BattleScene]
 };
