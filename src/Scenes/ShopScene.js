@@ -131,14 +131,15 @@ export default class ShopScene extends Phaser.Scene {
     const buttonColor = canAfford ? 0x7862ff : 0x555555;
     const textColor = canAfford ? "#ffffff" : "#888888";
 
-    const text = this.add.text(0, 0, label, {
+    const text = this.add.text(x, y, label, {
       fontSize: "22px",
       color: textColor,
       fontStyle: "bold",
-    });
+    }).setOrigin(0.5);
 
-    const padX = 30;
-    const padY = 16;
+    // Calculate button dimensions based on text
+    const padX = 26;
+    const padY = 14;
     const w = text.width + padX * 2;
     const h = text.height + padY * 2;
 
@@ -146,8 +147,6 @@ export default class ShopScene extends Phaser.Scene {
       .rectangle(x, y, w, h, buttonColor, 1)
       .setStrokeStyle(2, 0xffffff, canAfford ? 0.3 : 0.1)
       .setInteractive({ useHandCursor: canAfford });
-
-    text.setPosition(x - text.width / 2, y - text.height / 2);
 
     if (canAfford) {
       bg.on("pointerover", () => bg.setFillStyle(0x8b7bff, 1));
