@@ -1,8 +1,8 @@
 import Phaser from "phaser";
-import MenuScene from "./Scenes/MenuScene.js";
 import BattleScene from "./Scenes/BattleScene.js";
 import BoardScene from "./Scenes/BoardScene.js";
 import ShopScene from "./Scenes/ShopScene.js";
+import EventScene from "./Scenes/EventScene.js";
 
 const config = {
   type: Phaser.AUTO,
@@ -13,7 +13,7 @@ const config = {
     height: 1080,
   },
   backgroundColor: "#ffffff",
-  scene: [MenuScene, BoardScene, BattleScene, ShopScene]
+  scene: [BoardScene, BattleScene, ShopScene, EventScene]
 };
 
 new Phaser.Game(config);

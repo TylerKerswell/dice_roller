@@ -7,6 +7,7 @@ export default class Player {
     this.dice = [];  
     this.bag = baseBag;
     this.attackBonus = 0;
+    this.money = 0;
 
   }
 

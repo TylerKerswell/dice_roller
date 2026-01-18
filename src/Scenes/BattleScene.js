@@ -11,13 +11,13 @@ export default class BattleScene extends Phaser.Scene {
     this.returnScene = data?.returnScene ?? "BoardScene";
     this.runState = data?.runState ?? { floor: 1, tier: 0 };
     this.isBoss = !!data?.isBoss;
+    this.player = data?.player ?? new Player(100);
   }
 
   create() {
     const { width, height } = this.scale;
 
     // === ENTITIES ===
-    this.player = new Player(100);
     this.enemy = new Enemy(this.isBoss ? 120 : 60);
 
     // === BACKGROUND ===
@@ -168,10 +168,15 @@ export default class BattleScene extends Phaser.Scene {
   }
 
   win() {
+    // Award money for defeating enemy
+    const moneyReward = this.isBoss ? 50 : 25;
+    this.player.money = (this.player.money || 0) + moneyReward;
+
     this.scene.start(this.returnScene, {
       runState: this.runState,
       battleOutcome: "win",
       isBoss: this.isBoss,
+      player: this.player,
       lastResult: this.isBoss ? "Boss defeated!" : "Won fight!",
     });
   }
@@ -181,6 +186,7 @@ export default class BattleScene extends Phaser.Scene {
       runState: this.runState,
       battleOutcome: "lose",
       isBoss: this.isBoss,
+      player: this.player,
       lastResult: "Defeated...",
     });
   }

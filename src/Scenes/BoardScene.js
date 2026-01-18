@@ -63,7 +63,13 @@ export default class BoardScene extends Phaser.Scene {
 
   create() {
     if (this._shouldGoToWin) {
-      this.scene.start("MenuScene", { lastResult: "You win!" });
+      // Show win message and restart
+      this.infoText.setText("You win! Restarting...");
+      this.time.delayedCall(2000, () => {
+        this.registry.remove("runState");
+        this.registry.remove("player");
+        window.location.reload();
+      });
       return;
     }
 
@@ -79,6 +85,11 @@ export default class BoardScene extends Phaser.Scene {
     this.floorTierText = this.add
       .text(width * 0.06, height * 0.1, "", { fontFamily: "Arial", fontSize: "40px", color: "#fff", fontStyle: "bold" })
       .setOrigin(0, 0.5);
+
+    // Money display
+    this.moneyText = this.add
+      .text(width * 0.5, height * 0.1, "", { fontFamily: "Arial", fontSize: "24px", color: "#ffd700", fontStyle: "bold" })
+      .setOrigin(0.5, 0.5);
 
     this.bossInText = this.add
       .text(width * 0.94, height * 0.1, "", { fontFamily: "Arial", fontSize: "42px", color: "#ff3b3b", fontStyle: "bold" })
@@ -114,6 +125,18 @@ export default class BoardScene extends Phaser.Scene {
 
     this.infoText = this.add.text(width * 0.5, height * 0.92, "", { fontFamily: "Arial", fontSize: "16px", color: "#a7a7c7" }).setOrigin(0.5);
 
+    // How To Play button in lower left (within board borders)
+    this.makeButton(width * 0.10, height * 0.87, "How To Play", () => {
+      this.showHowToPlay();
+    });
+
+    // Quit button in lower right (within board borders)
+    this.makeButton(width * 0.90, height * 0.87, "Quit", () => {
+      this.registry.remove("runState");
+      this.registry.remove("player");
+      window.location.reload();
+    });
+
     // Keyboard
     this.input.keyboard.on("keydown-SPACE", () => this.handleRoll());
 
@@ -134,6 +157,7 @@ export default class BoardScene extends Phaser.Scene {
     const bossTier = this.bossTier();
 
     this.floorTierText.setText(`Floor ${floor}, Tier ${tier}`);
+    this.moneyText.setText(`Money: $${this.player.money || 0}`);
     this.bossInText.setText(`BOSS IN ${Math.max(0, bossTier - tier)}`);
 
     const windowStartTier = Math.max(0, tier - 1);
@@ -275,5 +299,53 @@ export default class BoardScene extends Phaser.Scene {
 
     bg.labelText = text;
     return bg;
+  }
+
+  showHowToPlay() {
+    const { width, height } = this.scale;
+
+    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.55);
+    const panel = this.add
+      .rectangle(width / 2, height / 2, width * 0.78, height * 0.55, 0x111123, 0.95)
+      .setStrokeStyle(2, 0xffffff, 0.15);
+
+    const title = this.add
+      .text(width / 2, height / 2 - 140, "How To Play", {
+        fontFamily: "Arial, sans-serif",
+        fontSize: "28px",
+        color: "#ffffff",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
+
+    const body = this.add
+      .text(
+        width / 2,
+        height / 2 - 60,
+        [
+          "Each turn you roll 3 dice.",
+          "For now, every die is an Attack die.",
+          "Total damage is the sum of all rolls.",
+          "",
+          "Goal: reduce the enemy to 0 HP.",
+          "Later: add shields, heals, poison, and upgrades.",
+        ].join("\n"),
+        {
+          fontFamily: "Arial, sans-serif",
+          fontSize: "18px",
+          color: "#d7d7f0",
+          align: "center",
+          lineSpacing: 8,
+        }
+      )
+      .setOrigin(0.5);
+
+    const close = this.makeButton(width / 2, height / 2 + 140, "Close", () => {
+      overlay.destroy();
+      panel.destroy();
+      title.destroy();
+      body.destroy();
+      close.destroy();
+    });
   }
 }
