@@ -6,6 +6,7 @@ export default class InventoryScene extends Phaser.Scene {
   }
 
   init(data) {
+    this.player = data.player;
     this.returnScene = data?.returnScene ?? "BoardScene";
   }
 
@@ -29,28 +30,45 @@ export default class InventoryScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     // === INVENTORY GRID ===
-    const cellSize = 80;
-    const cellSpacing = 10;
+    const cellSize = 120;      // bigger squares
+const cellSpacing = 15;
     const cols = 8;
-    const rows = 6;
-    
+
     const gridWidth = cols * cellSize + (cols - 1) * cellSpacing;
-    const gridHeight = rows * cellSize + (rows - 1) * cellSpacing;
     const startX = width / 2 - gridWidth / 2;
     const startY = height * 0.3;
 
-    // Create inventory cells
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        const x = startX + col * (cellSize + cellSpacing) + cellSize / 2;
-        const y = startY + row * (cellSize + cellSpacing) + cellSize / 2;
+    const dice = this.player?.bag ?? [];
 
-        // Cell background
-        this.add
-          .rectangle(x, y, cellSize, cellSize, 0x1c1c2b, 0.5)
-          .setStrokeStyle(2, 0xffffff, 0.2);
-      }
-    }
+    dice.forEach((die, index) => {
+      const col = index % cols;
+      const row = Math.floor(index / cols);
+
+      const x = startX + col * (cellSize + cellSpacing) + cellSize / 2;
+      const y = startY + row * (cellSize + cellSpacing) + cellSize / 2;
+
+      // Cell background
+      this.add
+        .rectangle(x, y, cellSize, cellSize, 0x1c1c2b, 0.9)
+        .setStrokeStyle(2, 0xffffff, 0.4);
+
+      // Die name
+      this.add.text(x, y - 20, die.name, {
+  fontSize: "18px",
+  color: "#ffffff",
+  fontStyle: "bold",
+  align: "center",
+  wordWrap: { width: cellSize - 10 },
+}).setOrigin(0.5);
+
+// Die description
+this.add.text(x, y + 25, die.description ?? "", {
+  fontSize: "14px",
+  color: "#cfcfe6",
+  align: "center",
+  wordWrap: { width: cellSize - 10 },
+}).setOrigin(0.5);
+    });
 
     // === BACK BUTTON ===
     this.makeButton(
@@ -58,17 +76,23 @@ export default class InventoryScene extends Phaser.Scene {
       height * 0.85,
       "BACK",
       () => {
-        this.scene.start(this.returnScene);
+        this.scene.start(this.returnScene, {
+          player: this.player,
+          runState: this.runState,
+        });
       }
     );
   }
 
   makeButton(x, y, label, onClick) {
-    const text = this.add.text(x, y, label, {
-      fontSize: "22px",
-      color: "#ffffff",
-      fontStyle: "bold",
-    }).setOrigin(0.5).setDepth(10);
+    const text = this.add
+      .text(x, y, label, {
+        fontSize: "22px",
+        color: "#ffffff",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5)
+      .setDepth(10);
 
     const padX = 26;
     const padY = 14;

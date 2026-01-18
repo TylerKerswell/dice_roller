@@ -264,8 +264,19 @@ export default class BoardScene extends Phaser.Scene {
       return;
     }
 
-    if (tType === "event" || tType === "mystery") {
-      this.infoText.setText(tType === "mystery" ? "Mystery event!" : "Event!");
+    if (tType === "mystery") {
+      this.infoText.setText("Mystery event!");
+      this.time.delayedCall(350, () => {
+        this.scene.start("MysteryScene", {
+          returnScene: "BoardScene",
+          runState: this.runState,
+          player: this.player,
+        });
+      });
+      return;
+    }
+    if (tType === "event") {
+      this.infoText.setText("Event!");
       this.time.delayedCall(350, () => {
         this.scene.start("EventScene", {
           returnScene: "BoardScene",
@@ -275,6 +286,7 @@ export default class BoardScene extends Phaser.Scene {
       });
       return;
     }
+  
 
     if (tType === "boss") {
       this.infoText.setText("BOSS!");

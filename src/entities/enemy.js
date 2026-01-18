@@ -1,34 +1,42 @@
-import { drawDice, rollAllAttackDice } from "../utils/dice.js";
+
+
+import { drawDice, rollAllDice, baseBag } from "../utils/dice.js";
 
 export default class Enemy {
   constructor(hp = 50) {
-    this.maxHp = hp; 
+    this.maxHp = hp;
     this.hp = hp;
+
+    this.bag = [...baseBag];
     this.dice = [];
+    this.dicePerAttack = 5;
   }
 
   takeDamage(amount) {
-    this.hp -= amount;
-    if (this.hp <= 0) {
-      this.hp = 0;
-      this.die();
-    }
+    this.hp = Math.max(0, this.hp - amount);
   }
 
   attack(player) {
-    this.dice = drawDice([{ basePower: 1 }], 5); 
-    const rolls = rollAllAttackDice(this.dice);
-    const totalDamage = rolls.reduce((sum, r) => sum + r.damage, 0);
+    this.dice = drawDice(this.bag, this.dicePerAttack);
 
-    player.takeDamage(totalDamage); 
-    this.dice = []; 
-    return totalDamage; 
-  }
+    const rolls = rollAllDice(this.dice, {});
 
-  die() {
-    console.log("Enemy defeated! Spawning new stronger enemy...");
-    this.maxHp *= 2;       
-    this.hp = this.maxHp;   
-    this.dice = [];         
+    const totalDamage = rolls.reduce(
+      (sum, r) => sum + r.damage,
+      0
+    );
+
+    if (totalDamage > 0) {
+      player.takeDamage(totalDamage);
+    }
+
+    this.dice = [];
+
+    return {
+      rolls,
+      totalDamage,
+      playerHp: player.hp,
+    };
   }
 }
+

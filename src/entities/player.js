@@ -1,66 +1,89 @@
-import { baseBag, drawDice, rollAllAttackDice, upgradedBag1, upgradedBag2, upgradedBag3 } from "../utils/dice.js";
+import { baseBag, drawDice, rollAllDice } from "../utils/dice.js";
 
 export default class Player {
   constructor(hp = 100) {
-    this.maxHp = hp; 
-    this.hp = hp;    
-    this.dice = [];  
-    this.bag = baseBag;
-    this.attackBonus = 0;
+    this.maxHp = hp;
+    this.hp = hp;
+
+    this.baseDice = [...baseBag];
+    this.bag = [...this.baseDice];
+
+    this.dice = [];
     this.money = 0;
+    this.attackBonus = 0;
+    this.dicePerAttack = 5;
 
   }
 
+   addDie(die) {
+    this.bag.push(die);
+  }
+
+
+
+
   roll() {
-    this.dice = drawDice(this.bag, 5); 
+    this.dice = drawDice(this.bag, this.dicePerAttack);
     return this.dice;
   }
 
   takeDamage(amount) {
-    this.hp -= amount;
-    if (this.hp <= 0) {
-      this.hp = 0;
-      this.die();
-    }
+    this.hp = Math.max(0, this.hp - amount);
   }
 
-  attack(enemy) {
-  if (this.dice.length === 0) this.roll();
-
-  const rolls = rollAllAttackDice(this.dice);
-  const totalDamage =
-  rolls.reduce((sum, r) => sum + r.damage, 0) + this.attackBonus;
-
-  enemy.takeDamage(totalDamage);
-  this.dice = [];
-
-  return { rolls, totalDamage };
-}
-
-
   heal(amount) {
-    this.hp += amount;
-    if (this.hp > this.maxHp) this.hp = this.maxHp;
+    this.hp = Math.min(this.maxHp, this.hp + amount);
   }
 
   increaseHealthCapacity(amount) {
     this.maxHp += amount;
-    if (this.hp > this.maxHp) this.hp = this.maxHp;
+    this.hp = Math.min(this.hp, this.maxHp);
   }
 
-  die() {
-    console.log("Game over");
-    this.upgradeBag()
-    // send back to menu screen?    
-  }
-upgradeBag() {
-    const bags = [baseBag, upgradedBag1, upgradedBag2, upgradedBag3];
-    const currentIndex = bags.indexOf(this.bag);
-    if (currentIndex >= 0 && currentIndex < bags.length - 1) {
-        this.bag = bags[currentIndex + 1];
+  attack(enemy) {
+    if (this.dice.length === 0) {
+      this.roll();
     }
-}
 
+    const rolls = rollAllDice(this.dice, {
+      playerHp: this.hp,
+      playerMaxHp: this.maxHp,
+    });
 
+    let totalEnemyDamage = 0;
+    let totalSelfDamage = 0;
+    let totalHealing = 0;
+
+    for (const r of rolls) {
+      totalEnemyDamage += r.damage;
+      totalSelfDamage += r.selfDamage;
+      totalHealing += r.selfHeal;
+    }
+
+    totalEnemyDamage += this.attackBonus;
+
+    if (totalEnemyDamage > 0) {
+      enemy.takeDamage(totalEnemyDamage);
+    }
+
+    if (totalSelfDamage > 0) {
+      this.takeDamage(totalSelfDamage);
+    }
+
+    if (totalHealing > 0) {
+      this.heal(totalHealing);
+    }
+
+    this.dice = [];
+
+    return {
+      rolls,
+      totalEnemyDamage,
+      totalSelfDamage,
+      totalHealing,
+      playerHp: this.hp,
+      enemyHp: enemy.hp,
+    };
   }
+}
 
