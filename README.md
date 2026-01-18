@@ -6,7 +6,8 @@ The game blends chance and decision-making: while dice rolls introduce randomnes
 
 Built as a hackathon prototype, Dice Dungeon focuses on clean gameplay mechanics, clarity, and fast iteration rather than complex visuals.
 
-##Key Features
+**#Key Features**
+
 -Dice-based combat with player choice and risk management
 
 -Roguelike progression with floors, tiers, and bosses
