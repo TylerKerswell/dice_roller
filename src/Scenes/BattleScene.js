@@ -20,6 +20,10 @@ export default class BattleScene extends Phaser.Scene {
     // === ENTITIES ===
     this.enemy = new Enemy(this.isBoss ? 120 : 60);
 
+    // === STATE ===
+    this.phase = "need_roll"; // "need_roll" | "choose" | "enemy_turn"
+    this.rerollsUsed = 0;
+
     // === BACKGROUND ===
     this.add.rectangle(width / 2, height / 2, width, height, 0x0b0b12);
     this.add.rectangle(width / 2, height / 2, width * 0.9, height * 0.82, 0xffffff, 0.06)
@@ -38,6 +42,7 @@ export default class BattleScene extends Phaser.Scene {
     }).setOrigin(1, 0.5);
 
     // === DICE CONTAINER ===
+    this.diceContainer = this.add.container(width * 0.5, height * 0.42).setDepth(10);
     this.diceContainer = this.add.container(width * 0.5, height * 0.42).setDepth(10);
 
     // === PLAYER HP TEXT ===
@@ -151,17 +156,93 @@ export default class BattleScene extends Phaser.Scene {
         .setOrigin(0.5)
         .setDepth(11);
 
+      // Selection tint via alpha
+      const applySelectedStyle = () => {
+        const isSelected = !!die.selected;
+        box.setAlpha(isSelected ? 1 : 0.35);
+        text.setAlpha(isSelected ? 1 : 0.35);
+      };
+      applySelectedStyle();
+
+      // Click to toggle selection
+      box.setInteractive({ useHandCursor: true });
+      box.on("pointerdown", () => {
+        die.selected = !die.selected;
+        applySelectedStyle();
+      });
+
+      this.diceContainer.add([box, text]);
+    });
+  }
+
+  // Uses selected dice only
+  attack() {
+    if (this.phase !== "choose") return;
+
+    const dice = this.player.dice ?? [];
+    if (dice.length === 0) {
+      this.messageText.setText("You must roll first.");
+      return;
+    }
+
+    const selected = dice.filter((d) => d.selected);
+    if (selected.length === 0) {
+      this.messageText.setText("Select at least 1 die to attack.");
+      return;
+    }
+
+    // Prevent spam while animating/processing
+    this.phase = "enemy_turn";
+    this.updateButtonStates();
+
+    // Compute damage from selected dice
+    const rolls = selected.map((d) => ({ roll: d.roll ?? d.value ?? d }));
+    let totalDamage = rolls.reduce((sum, r) => sum + Number(r.roll), 0);
+
+    // Small synergy (free nuance): all dice same number => bonus
+    const values = rolls.map((r) => r.roll);
+    if (new Set(values).size === 1 && values.length >= 2) {
+      totalDamage += 3;
+      this.messageText.setText("Combo! Same faces bonus +3.");
+    }
+
+    // Apply damage
+    this.enemy.hp -= totalDamage;
+    this.updateHp();
+
+    // Show dice animation (reuse your existing animation style)
+    this.animateDiceReveal(rolls, totalDamage, () => this.afterPlayerAttack(totalDamage));
+  }
+
+  animateDiceReveal(rolls, totalDamage, onDone) {
+    // Clear and draw animated dice like your original code
+    this.diceContainer.removeAll(true);
+
+    const boxSize = 46;
+    const spacing = 10;
+    const startX = -((rolls.length * (boxSize + spacing)) - spacing) / 2;
+
+    const diceTexts = [];
+    rolls.forEach((r, i) => {
+      const x = startX + i * (boxSize + spacing);
+
+      const box = this.add.rectangle(x, 0, boxSize, boxSize, 0xffffff).setDepth(10);
+      const text = this.add
+        .text(x, 0, "?", { fontSize: "22px", color: "#000000", fontStyle: "bold" })
+        .setOrigin(0.5)
+        .setDepth(11);
+
       this.diceContainer.add([box, text]);
       diceVisuals.push({ text, roll: r });
     });
 
-    // Animate dice rolling
     this.messageText.setText("Rolling dice...");
     const rollDuration = 800;
     const rollInterval = 100;
     const numRolls = Math.floor(rollDuration / rollInterval);
-    let currentRoll = 0;
+    let current = 0;
 
+    this.time.addEvent({
     this.time.addEvent({
       delay: rollInterval,
       repeat: numRolls - 1,
