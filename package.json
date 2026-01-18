@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "NW Hacks 2026 Hackathon project repository.",
   "main": "index.js",
-  "homepage": "https://tylerkerswell.ca",
+  "homepage": "https://tylerkerswell.github.io/dice_roller/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
