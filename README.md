@@ -8,6 +8,9 @@ Built as a hackathon prototype, Dice Dungeon focuses on clean gameplay mechanics
 
 ##Key Features
 -Dice-based combat with player choice and risk management
+
 -Roguelike progression with floors, tiers, and bosses
+
 -Simple but strategic turn-based battles
+
 -Lightweight, browser-playable prototype built with Phaser
