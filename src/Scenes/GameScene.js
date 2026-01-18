@@ -34,33 +34,41 @@ export default class GameScene extends Phaser.Scene {
   }
 
   playerRoll() {
-    const dice = this.player.roll();
-    // Show dice IDs and base power
-    this.diceText.setText("Dice: " + dice.map((d,i)=>`D${i+1}(${d.basePower})`).join(", "));
-    this.messageText.setText("You rolled the dice! Now attack!");
-  }
+  const dice = this.player.roll(); 
+  const rolls = rollAllAttackDice(dice); 
+  this.player.diceRolls = rolls;
+  this.diceText.setText(
+    "Dice: " + rolls.map((r, i) => `D${i + 1}(${r.roll}×${r.die.basePower}=${r.damage})`).join(", ")
+  );
+
+  this.messageText.setText("You rolled the dice! Now attack!");
+}
+
 
   playerAttack() {
-    if (!this.player.dice.length) {
-      this.messageText.setText("Roll dice first!");
-      return;
-    }
-
-    const rolls = rollAllAttackDice(this.player.dice);
-    const totalDamage = rolls.reduce((sum,r)=>sum+r.damage,0);
-
-    this.player.attack(this.enemy);
-    this.updateHpTexts();
-    this.messageText.setText(`You dealt ${totalDamage} damage!`);
-
-    // Enemy turn after short delay
-    if (this.enemy.hp > 0) {
-      this.time.delayedCall(1000, () => this.enemyTurn(), [], this);
-    } else {
-      this.messageText.setText("Enemy defeated! A stronger enemy appears!");
-      this.updateHpTexts();
-    }
+  if (!this.player.diceRolls || this.player.diceRolls.length === 0) {
+    this.messageText.setText("Roll dice first!");
+    return;
   }
+
+  const totalDamage = this.player.diceRolls.reduce((sum, r) => sum + r.damage, 0);
+
+  this.player.attack(this.enemy, totalDamage); // pass totalDamage
+  this.updateHpTexts();
+  this.messageText.setText(`You dealt ${totalDamage} damage!`);
+
+  // Clear dice rolls for next turn
+  this.player.diceRolls = [];
+
+  // Enemy turn after short delay
+  if (this.enemy.hp > 0) {
+    this.time.delayedCall(1000, () => this.enemyTurn(), [], this);
+  } else {
+    this.messageText.setText("Enemy defeated! A stronger enemy appears!");
+    this.updateHpTexts();
+  }
+}
+
 
   enemyTurn() {
     const totalDamage = this.enemy.attack(this.player);
