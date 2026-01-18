@@ -121,12 +121,16 @@ export default class BattleScene extends Phaser.Scene {
     const { rolls, totalDamage } = this.player.attack(this.enemy);
     this.updateHp();
 
-    // === DRAW DICE ===
+    // === DRAW DICE WITH ROLLING ANIMATION ===
     const boxSize = 46;
     const spacing = 10;
     const startX =
       -((rolls.length * (boxSize + spacing)) - spacing) / 2;
 
+    const diceTexts = [];
+    const diceBoxes = [];
+
+    // Create dice containers first
     rolls.forEach((r, i) => {
       const x = startX + i * (boxSize + spacing);
 
@@ -135,7 +139,7 @@ export default class BattleScene extends Phaser.Scene {
         .setDepth(10);
 
       const text = this.add
-        .text(x, 0, r.roll, {
+        .text(x, 0, "?", {
           fontSize: "22px",
           color: "#000000",
           fontStyle: "bold",
@@ -144,34 +148,62 @@ export default class BattleScene extends Phaser.Scene {
         .setDepth(11);
 
       this.diceContainer.add([box, text]);
+      diceTexts.push(text);
+      diceBoxes.push(box);
     });
 
-    this.messageText.setText(`Total damage: ${totalDamage}`);
+    // Animate dice rolling
+    this.messageText.setText("Rolling dice...");
+    const rollDuration = 800; // milliseconds
+    const rollInterval = 100; // milliseconds per number change
+    const numRolls = Math.floor(rollDuration / rollInterval);
+    let currentRoll = 0;
 
-    if (this.enemy.hp <= 0) {
-      this.time.delayedCall(800, () => this.win());
-      return;
-    }
+    const rollTimer = this.time.addEvent({
+      delay: rollInterval,
+      repeat: numRolls - 1,
+      callback: () => {
+        diceTexts.forEach((text) => {
+          text.setText(Phaser.Math.Between(1, 6));
+        });
+        currentRoll++;
+        
+        // On last roll, show final values and handle battle results
+        if (currentRoll >= numRolls) {
+          rolls.forEach((r, i) => {
+            diceTexts[i].setText(r.roll);
+          });
+          this.messageText.setText(`Total damage: ${totalDamage}`);
 
-    // === ENEMY COUNTER ===
-    this.time.delayedCall(700, () => {
-      const enemyDamage = this.enemy.attack(this.player);
-      this.updateHp();
+          // Handle enemy defeat or counterattack after animation completes
+          if (this.enemy.hp <= 0) {
+            // Award money for defeating enemy
+            const moneyReward = this.isBoss ? 50 : 25;
+            this.player.money = (this.player.money || 0) + moneyReward;
+            this.time.delayedCall(500, () => {
+              this.messageText.setText(`Enemy defeated! +$${moneyReward}`);
+              this.time.delayedCall(800, () => this.win());
+            });
+          } else {
+            // === ENEMY COUNTER ===
+            this.time.delayedCall(700, () => {
+              const enemyDamage = this.enemy.attack(this.player);
+              this.updateHp();
 
-      if (this.player.hp <= 0) {
-        this.messageText.setText("You were defeated...");
-        this.time.delayedCall(900, () => this.lose());
-      } else {
-        this.messageText.setText(`Enemy dealt ${enemyDamage} damage.`);
+              if (this.player.hp <= 0) {
+                this.messageText.setText("You were defeated...");
+                this.time.delayedCall(900, () => this.lose());
+              } else {
+                this.messageText.setText(`Enemy dealt ${enemyDamage} damage.`);
+              }
+            });
+          }
+        }
       }
     });
   }
 
   win() {
-    // Award money for defeating enemy
-    const moneyReward = this.isBoss ? 50 : 25;
-    this.player.money = (this.player.money || 0) + moneyReward;
-
     this.scene.start(this.returnScene, {
       runState: this.runState,
       battleOutcome: "win",
@@ -192,11 +224,11 @@ export default class BattleScene extends Phaser.Scene {
   }
 
   makeButton(x, y, label, onClick) {
-    const text = this.add.text(0, 0, label, {
+    const text = this.add.text(x, y, label, {
       fontSize: "22px",
       color: "#ffffff",
       fontStyle: "bold",
-    });
+    }).setOrigin(0.5).setDepth(10);
 
     const padX = 26;
     const padY = 14;
@@ -206,9 +238,8 @@ export default class BattleScene extends Phaser.Scene {
     const bg = this.add
       .rectangle(x, y, w, h, 0x7862ff, 0.9)
       .setStrokeStyle(2, 0xffffff, 0.2)
-      .setInteractive({ useHandCursor: true });
-
-    text.setPosition(x - text.width / 2, y - text.height / 2);
+      .setInteractive({ useHandCursor: true })
+      .setDepth(9);
 
     bg.on("pointerover", () => bg.setFillStyle(0x8b7bff, 0.95));
     bg.on("pointerout", () => bg.setFillStyle(0x7862ff, 0.9));

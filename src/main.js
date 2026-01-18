@@ -3,6 +3,7 @@ import BattleScene from "./Scenes/BattleScene.js";
 import BoardScene from "./Scenes/BoardScene.js";
 import ShopScene from "./Scenes/ShopScene.js";
 import EventScene from "./Scenes/EventScene.js";
+import InventoryScene from "./Scenes/InventoryScene.js";
 
 const BASE_WIDTH = 1920;
 const BASE_HEIGHT = 1080;
@@ -29,14 +30,14 @@ const config = {
     // powerPreference: "high-performance", // optional
   },
 
-  backgroundColor: "#ffffff",
+  backgroundColor: "#0b0b12",
 
   fps: {
     target: 60,
     forceSetTimeOut: true,             // helps some browsers
   },
 
-  scene: [MenuScene, BoardScene, BattleScene, ShopScene],
+  scene: [BoardScene, BattleScene, ShopScene, EventScene, InventoryScene],
 };
 
 new Phaser.Game(config);
