@@ -85,7 +85,8 @@ export default class MenuScene extends Phaser.Scene {
       .setStrokeStyle(2, 0xffffff, 0.2)
       .setInteractive({ useHandCursor: true });
 
-    text.setPosition(x - text.width / 2, y - text.height / 2);
+    text.setOrigin(0.5, 0.55);
+    text.setPosition(x, y);
 
     bg.on("pointerover", () => {
       bg.setFillStyle(0x8b7bff, 0.95);
