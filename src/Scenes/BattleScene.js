@@ -16,6 +16,7 @@ export default class BattleScene extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale;
+    
 
     // === ENTITIES ===
     this.enemy = new Enemy(this.isBoss ? 120 : 60);
