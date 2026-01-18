@@ -4,6 +4,8 @@ import BoardScene from "./Scenes/BoardScene.js";
 import ShopScene from "./Scenes/ShopScene.js";
 import EventScene from "./Scenes/EventScene.js";
 import InventoryScene from "./Scenes/InventoryScene.js";
+import MenuScene from "./Scenes/MenuScene.js";
+import MysteryScene from "./Scenes/MysteryScene.js";
 
 const BASE_WIDTH = 1920;
 const BASE_HEIGHT = 1080;
@@ -37,7 +39,7 @@ const config = {
     forceSetTimeOut: true,             // helps some browsers
   },
 
-  scene: [BoardScene, BattleScene, ShopScene, EventScene, InventoryScene],
+  scene: [MenuScene, BoardScene, BattleScene, ShopScene, EventScene, InventoryScene, MysteryScene],
 };
 
 new Phaser.Game(config);
