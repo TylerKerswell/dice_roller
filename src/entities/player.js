@@ -6,6 +6,8 @@ export default class Player {
     this.hp = hp;    
     this.dice = [];  
     this.bag = baseBag;
+    this.attackBonus = 0;
+
   }
 
   roll() {
@@ -22,15 +24,18 @@ export default class Player {
   }
 
   attack(enemy) {
-    if (this.dice.length === 0) this.roll();
+  if (this.dice.length === 0) this.roll();
 
-    const rolls = rollAllAttackDice(this.dice);
-    const totalDamage = rolls.reduce((sum, r) => sum + r.damage, 0);
+  const rolls = rollAllAttackDice(this.dice);
+  const totalDamage =
+  rolls.reduce((sum, r) => sum + r.damage, 0) + this.attackBonus;
 
-    enemy.takeDamage(totalDamage); 
-    this.dice = []; 
-    return totalDamage; 
-  }
+  enemy.takeDamage(totalDamage);
+  this.dice = [];
+
+  return { rolls, totalDamage };
+}
+
 
   heal(amount) {
     this.hp += amount;
