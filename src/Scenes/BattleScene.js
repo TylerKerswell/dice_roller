@@ -680,6 +680,7 @@ const ENTITY_IMAGES = {
   player: "assets/player.png",
   enemy: "assets/enemy.png",
   boss: "assets/enemy2.png",
+  heart: "assets/heart.png"
 };
 
 export default class BattleScene extends Phaser.Scene {
@@ -729,6 +730,8 @@ export default class BattleScene extends Phaser.Scene {
     // === HP TEXT AND BARS ===
     this.setupHpBars(width, height);
 
+    
+
     // === MESSAGE ===
     this.messageText = this.add.text(width * 0.5, height * 0.5, "Roll to begin the fight.", {
       fontSize: "18px",
@@ -753,8 +756,8 @@ export default class BattleScene extends Phaser.Scene {
 
     // ENEMY/BOSS in middle, leaning right
     const enemyKey = this.isBoss ? "boss" : "enemy";
-    this.enemySprite = this.add.image(width * 0.65, height * 0.5, enemyKey)
-      .setDisplaySize(220, 220)
+    this.enemySprite = this.add.image(width * 0.65, height * 0.4, enemyKey)
+      .setDisplaySize(300, 300)
       .setOrigin(0.5, 0.5)
       .setRotation(0.15);
 
@@ -776,6 +779,11 @@ export default class BattleScene extends Phaser.Scene {
       .setOrigin(0, 0.5);
     this.playerHpBar = this.add.rectangle(playerBarX, playerBarY, this.playerBarWidth, playerBarHeight, 0x00ff00)
       .setOrigin(0, 0.5);
+
+      const heartOffset = 30; // distance to the left of the bar
+    this.playerHeart = this.add.image(playerBarX - heartOffset, playerBarY, "heart")
+      .setDisplaySize(playerBarHeight + 8, playerBarHeight + 8) // match height of bar
+      .setOrigin(0.5);
 
     this.playerHpText = this.add.text(width * 0.15, height * 0.28, "", {
       fontSize: "26px",
