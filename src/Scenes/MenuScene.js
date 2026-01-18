@@ -35,11 +35,8 @@ export default class MenuScene extends Phaser.Scene {
     // Buttons
     const startBtn = this.makeButton(width / 2, height * 0.50, "Start Run", () => {
       // Pass run data to the next scene (optional)
-      this.scene.start("GameScene", {
-        floor: 1,
-        difficulty: "normal",
-        seed: Math.floor(Math.random() * 1000000),
-      });
+      this.scene.start("BoardScene", {
+      runState: { floor: 1, tier: 0 }});
     });
 
     const howBtn = this.makeButton(width / 2, height * 0.62, "How To Play", () => {
