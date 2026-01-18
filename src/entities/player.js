@@ -1,20 +1,24 @@
-import { drawDice, rollAllAttackDice } from "../utils/dice.js";
+import { baseBag, drawDice, rollAllAttackDice, upgradedBag1, upgradedBag2, upgradedBag3 } from "../utils/dice.js";
 
 export default class Player {
   constructor(hp = 100) {
     this.maxHp = hp; 
     this.hp = hp;    
     this.dice = [];  
+    this.bag = baseBag;
   }
 
   roll() {
-    this.dice = drawDice([{ basePower: 1 }], 5); 
+    this.dice = drawDice(this.bag, 5); 
     return this.dice;
   }
 
   takeDamage(amount) {
     this.hp -= amount;
-    if (this.hp < 0) this.hp = 0;
+    if (this.hp <= 0) {
+      this.hp = 0;
+      this.die();
+    }
   }
 
   attack(enemy) {
@@ -37,4 +41,20 @@ export default class Player {
     this.maxHp += amount;
     if (this.hp > this.maxHp) this.hp = this.maxHp;
   }
+
+  die() {
+    console.log("Game over");
+    this.upgradeBag()
+    // send back to menu screen?    
+  }
+upgradeBag() {
+    const bags = [baseBag, upgradedBag1, upgradedBag2, upgradedBag3];
+    const currentIndex = bags.indexOf(this.bag);
+    if (currentIndex >= 0 && currentIndex < bags.length - 1) {
+        this.bag = bags[currentIndex + 1];
+    }
 }
+
+
+  }
+
