@@ -92,25 +92,49 @@ export default class ShopScene extends Phaser.Scene {
 
     // Store reference to money text for updates
     this.moneyText = moneyText;
+
+    // === BACK BUTTON ===
+    this.makeBackButton(
+      width / 2,
+      height * 0.85,
+      "BACK",
+      () => {
+        this.leaveShop("");
+      }
+    );
   }
 
   purchase(cost) {
     const playerMoney = this.player.money || 0;
     if (playerMoney >= cost) {
+      // Deduct money
       this.player.money = playerMoney - cost;
       this.moneyText.setText(`Money: $${this.player.money}`);
+      
+      // Show purchase confirmation
+      const msg = this.add
+        .text(this.scale.width / 2, this.scale.height * 0.8, `Purchased! -$${cost}`, {
+          fontSize: "18px",
+          color: "#4ade80",
+          fontStyle: "bold",
+        })
+        .setOrigin(0.5);
+
+      this.time.delayedCall(1000, () => {
+        msg.destroy();
+      });
       return true;
     } else {
       // Show insufficient funds message
       const msg = this.add
-        .text(this.scale.width / 2, this.scale.height * 0.8, "Not enough money!", {
+        .text(this.scale.width / 2, this.scale.height * 0.8, `Not enough money! Need $${cost}, have $${playerMoney}`, {
           fontSize: "18px",
           color: "#ff3b3b",
           fontStyle: "bold",
         })
         .setOrigin(0.5);
 
-      this.time.delayedCall(1500, () => {
+      this.time.delayedCall(2000, () => {
         msg.destroy();
       });
       return false;
@@ -131,27 +155,53 @@ export default class ShopScene extends Phaser.Scene {
     const buttonColor = canAfford ? 0x7862ff : 0x555555;
     const textColor = canAfford ? "#ffffff" : "#888888";
 
+    const padX = 26;
+    const padY = 14;
+
     const text = this.add.text(x, y, label, {
       fontSize: "22px",
       color: textColor,
       fontStyle: "bold",
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setDepth(10);
 
-    // Calculate button dimensions based on text
-    const padX = 26;
-    const padY = 14;
     const w = text.width + padX * 2;
     const h = text.height + padY * 2;
 
     const bg = this.add
       .rectangle(x, y, w, h, buttonColor, 1)
       .setStrokeStyle(2, 0xffffff, canAfford ? 0.3 : 0.1)
-      .setInteractive({ useHandCursor: canAfford });
+      .setInteractive({ useHandCursor: canAfford })
+      .setDepth(9);
 
     if (canAfford) {
       bg.on("pointerover", () => bg.setFillStyle(0x8b7bff, 1));
       bg.on("pointerout", () => bg.setFillStyle(0x7862ff, 1));
       bg.on("pointerdown", onClick);
     }
+  }
+
+  makeBackButton(x, y, label, onClick) {
+    const text = this.add.text(x, y, label, {
+      fontSize: "22px",
+      color: "#ffffff",
+      fontStyle: "bold",
+    }).setOrigin(0.5).setDepth(10);
+
+    const padX = 26;
+    const padY = 14;
+    const w = text.width + padX * 2;
+    const h = text.height + padY * 2;
+
+    const bg = this.add
+      .rectangle(x, y, w, h, 0x7862ff, 0.9)
+      .setStrokeStyle(2, 0xffffff, 0.2)
+      .setInteractive({ useHandCursor: true })
+      .setDepth(9);
+
+    bg.on("pointerover", () => bg.setFillStyle(0x8b7bff, 0.95));
+    bg.on("pointerout", () => bg.setFillStyle(0x7862ff, 0.9));
+    bg.on("pointerdown", onClick);
+
+    return bg;
   }
 }

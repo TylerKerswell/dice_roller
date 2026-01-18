@@ -125,9 +125,13 @@ export default class BoardScene extends Phaser.Scene {
 
     this.infoText = this.add.text(width * 0.5, height * 0.92, "", { fontFamily: "Arial", fontSize: "16px", color: "#a7a7c7" }).setOrigin(0.5);
 
-    // How To Play button in lower left (within board borders)
-    this.makeButton(width * 0.10, height * 0.87, "How To Play", () => {
-      this.showHowToPlay();
+    // Inventory button (lower left)
+    this.makeButton(width * 0.10, height * 0.87, "Inventory", () => {
+      this.scene.start("InventoryScene", {
+        returnScene: "BoardScene",
+        runState: this.runState,
+        player: this.player,
+      });
     });
 
     // Quit button in lower right (within board borders)
@@ -282,16 +286,22 @@ export default class BoardScene extends Phaser.Scene {
   }
 
   makeButton(x, y, label, onClick) {
-    const text = this.add.text(0, 0, label, { fontFamily: "Arial", fontSize: "22px", color: "#fff", fontStyle: "bold" });
-    const padX = 26, padY = 14;
+    const text = this.add.text(x, y, label, {
+      fontSize: "22px",
+      color: "#ffffff",
+      fontStyle: "bold",
+    }).setOrigin(0.5).setDepth(10);
+
+    const padX = 26;
+    const padY = 14;
     const w = text.width + padX * 2;
     const h = text.height + padY * 2;
 
-    const bg = this.add.rectangle(x, y, w, h, 0x7862ff, 0.9)
+    const bg = this.add
+      .rectangle(x, y, w, h, 0x7862ff, 0.9)
       .setStrokeStyle(2, 0xffffff, 0.2)
-      .setInteractive({ useHandCursor: true });
-
-    text.setPosition(x - text.width / 2, y - text.height / 2);
+      .setInteractive({ useHandCursor: true })
+      .setDepth(9);
 
     bg.on("pointerover", () => bg.setFillStyle(0x8b7bff, 0.95));
     bg.on("pointerout", () => bg.setFillStyle(0x7862ff, 0.9));
@@ -299,53 +309,5 @@ export default class BoardScene extends Phaser.Scene {
 
     bg.labelText = text;
     return bg;
-  }
-
-  showHowToPlay() {
-    const { width, height } = this.scale;
-
-    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.55);
-    const panel = this.add
-      .rectangle(width / 2, height / 2, width * 0.78, height * 0.55, 0x111123, 0.95)
-      .setStrokeStyle(2, 0xffffff, 0.15);
-
-    const title = this.add
-      .text(width / 2, height / 2 - 140, "How To Play", {
-        fontFamily: "Arial, sans-serif",
-        fontSize: "28px",
-        color: "#ffffff",
-        fontStyle: "bold",
-      })
-      .setOrigin(0.5);
-
-    const body = this.add
-      .text(
-        width / 2,
-        height / 2 - 60,
-        [
-          "Each turn you roll 3 dice.",
-          "For now, every die is an Attack die.",
-          "Total damage is the sum of all rolls.",
-          "",
-          "Goal: reduce the enemy to 0 HP.",
-          "Later: add shields, heals, poison, and upgrades.",
-        ].join("\n"),
-        {
-          fontFamily: "Arial, sans-serif",
-          fontSize: "18px",
-          color: "#d7d7f0",
-          align: "center",
-          lineSpacing: 8,
-        }
-      )
-      .setOrigin(0.5);
-
-    const close = this.makeButton(width / 2, height / 2 + 140, "Close", () => {
-      overlay.destroy();
-      panel.destroy();
-      title.destroy();
-      body.destroy();
-      close.destroy();
-    });
   }
 }
