@@ -4,6 +4,14 @@ import Player from "../entities/player.js";
 const MAX_FLOORS = 3;
 const TIERS_PER_FLOOR = 42;
 
+// --- Add this at the top with your imports ---
+const BOARD_IMAGES = {
+  coin: "assets/coin.png",
+};
+
+
+
+
 function clamp(n, a, b) {
   return Math.max(a, Math.min(b, n));
 }
@@ -22,6 +30,11 @@ function tileTypeForTier(tier, bossTier) {
 export default class BoardScene extends Phaser.Scene {
   constructor() {
     super("BoardScene");
+  }
+
+  preload() {
+    // Load coin image
+    this.load.image("coin", BOARD_IMAGES.coin);
   }
 
   init(data) {
@@ -98,6 +111,10 @@ export default class BoardScene extends Phaser.Scene {
     this.moneyText = this.add
       .text(width * 0.5, height * 0.1, "", { fontFamily: "Arial", fontSize: "24px", color: "#ffd700", fontStyle: "bold" })
       .setOrigin(0.5, 0.5);
+
+      this.coinIcon = this.add.image(this.moneyText.x - 75, this.moneyText.y, "coin")
+  .setDisplaySize(24, 24)
+  .setOrigin(0.5);
 
     this.bossInText = this.add
       .text(width * 0.94, height * 0.1, "", { fontFamily: "Arial", fontSize: "42px", color: "#ff3b3b", fontStyle: "bold" })
